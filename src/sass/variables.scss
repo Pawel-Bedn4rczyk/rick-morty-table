@@ -1,0 +1,21 @@
+$paginationItemSize: 40px;
+$defaultFontSize: 16px;
+
+// Set Globals
+$body-font-family: "Poppins", sans-serif;
+$font-size-root: $defaultFontSize;
+$tab-font-size: $defaultFontSize;
+$text-field-border-radius: 10px;
+$tabs-item-padding: 0;
+$btn-border-radius: 10px;
+$btn-round-border-radius: none;
+//Table
+$data-table-regular-header-font-size: $defaultFontSize;
+$data-table-regular-row-font-weight: "400";
+$data-table-regular-row-font-size: $defaultFontSize;
+// Pagination
+$pagination-navigation-width: $paginationItemSize;
+$pagination-navigation-height: $paginationItemSize;
+$pagination-more-width: $paginationItemSize;
+$pagination-item-height: $paginationItemSize;
+$pagination-item-min-width: $paginationItemSize;
