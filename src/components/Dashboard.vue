@@ -1,13 +1,25 @@
 <template>
   <div>
-    <v-row class="mx-10 pl-16 py-7" align="center" no-gutters>
+    <v-row
+      class="mx-md-10 pl-md-16 py-7"
+      justify="center"
+      justify-md="start"
+      align="center"
+      no-gutters
+    >
       <Logo />
-      <v-col cols="12" lg="4" class="ml-16 pl-16 d-flex align-center">
+      <v-col
+        cols="10"
+        md="5"
+        lg="4"
+        xl="3"
+        class="ml-2 ml-md-16 pt-5 pt-md-0 pl-md-16 d-flex justify-center"
+      >
         <v-text-field
           v-model="search"
+          :color="defaultColor"
           class="defaultFontWeight"
           label="Start typing to search..."
-          :color="defaultColor"
           height="56"
           outlined
           hide-details
@@ -17,14 +29,19 @@
       </v-col>
     </v-row>
     <v-divider />
-    <v-row class="mx-0 pt-7">
+    <v-row v-if="checkCharacterArrays" class="mx-0 py-10">
       <v-tabs
         v-model="tabModel"
         :slider-color="defaultColor"
         :color="defaultColor"
-        class="mx-10 pl-16 pb-7"
+        :grow="$vuetify.breakpoint.smAndDown"
+        class="mx-2 mx-md-10 pl-md-16 pb-7"
       >
-        <v-tab v-for="(tab, i) in tabs" :key="i" :class="`ml-${tab.margin}`">
+        <v-tab
+          v-for="(tab, i) in tabs"
+          :key="i"
+          :class="bpMdAndUp ? 'tabMargin' : ''"
+        >
           {{ tab.title }}
         </v-tab>
       </v-tabs>
@@ -36,14 +53,26 @@
             :searchVal="search"
             :favCharactersTab="Boolean(tabModel)"
             :characters="getcharacters"
+            :pageCounter="pagination.pageCounter"
+            :currentPage="pagination.currentPage"
+            :mobile="!bpMdAndUp"
+            @changePage="setCharacters"
             @favAdd="favAdd"
             @openDeleteDialog="openDeleteDialog"
           />
         </v-tab-item>
       </v-tabs-items>
     </v-row>
-    <v-snackbar v-model="snackbar" :color="defaultColor">
-      {{ snackbarText }}
+    <v-row justify="center" align="center" class="ma-0 mt-16" v-else>
+      <v-progress-circular
+        size="80"
+        indeterminate
+        :color="defaultColor"
+      ></v-progress-circular>
+    </v-row>
+
+    <v-snackbar v-model="snackbar.model" :color="defaultColor">
+      {{ snackbar.text }}
     </v-snackbar>
     <DeleteDialog
       v-model="deleteDialog"
@@ -55,12 +84,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import Logo from "@/components/Logo.vue";
 import Table from "@/components/Table.vue";
 import DeleteDialog from "@/components/DeleteDialog.vue";
 import { DashboardTabsE } from "@/enums";
-import { CharacterI } from "@/interfaces";
+import { CharacterI, ApiResponseI } from "@/interfaces";
+import { getCharacter, getEpisode } from "rickmortyapi";
 
 @Component({
   components: {
@@ -73,149 +103,38 @@ export default class Dashboard extends Vue {
   tabModel = 0;
   search = "";
   defaultColor = "#11B0C8";
-  snackbar = false;
-  snackbarText = "";
-  favChars: CharacterI[] = [];
   deleteDialog = false;
   itemToDelete: CharacterI | null = null;
+  charactersModified: CharacterI[] = [];
+  allCharacters: CharacterI[] = [];
+  favChars: CharacterI[] = [];
+
+  snackbar = {
+    model: false,
+    text: "",
+  };
+
+  pagination = {
+    pageCounter: 0,
+    currentPage: 1,
+  };
+
   tabs = [
     {
       title: DashboardTabsE.ALL,
-      margin: "0",
     },
     {
       title: DashboardTabsE.FAV,
-      margin: "16",
     },
   ];
-  // apollo = {
-  //   characters: gql`
-  //     query {
-  //       info {
-  //         count
-  //         pages
-  //       }
-  //       results {
-  //         id
-  //         name
-  //         image
-  //         species
-  //         status
-  //         type
-  //       }
-  //     }
-  //   `,
-  // };
-  // characters: CharacterI[] = [
-  //   {
-  //     id: 50,
-  //     name: "Blim Blam",
-  //     status: "Alive",
-  //     species: "Alien",
-  //     type: "Korblock",
-  //     gender: "Male",
-  //     origin: {
-  //       name: "unknown",
-  //       url: "",
-  //     },
-  //     location: {
-  //       name: "Earth (Replacement Dimension)",
-  //       url: "https://rickandmortyapi.com/api/location/20",
-  //     },
-  //     image: "https://rickandmortyapi.com/api/character/avatar/50.jpeg",
-  //     episode: "S01E05",
-  //     url: "https://rickandmortyapi.com/api/character/50",
-  //     created: "2017-11-05T11:21:43.756Z",
-  //   },
-  //   {
-  //     id: 22,
-  //     name: "Aqua Rick",
-  //     status: "unknown",
-  //     species: "Humanoid",
-  //     type: "Fish-Person",
-  //     gender: "Male",
-  //     origin: {
-  //       name: "unknown",
-  //       url: "",
-  //     },
-  //     location: {
-  //       name: "Citadel of Ricks",
-  //       url: "https://rickandmortyapi.com/api/location/3",
-  //     },
-  //     image: "https://rickandmortyapi.com/api/character/avatar/22.jpeg",
-  //     episode: "S01E05",
-  //     url: "https://rickandmortyapi.com/api/character/22",
-  //     created: "2017-11-04T22:41:07.171Z",
-  //   },
-  //   {
-  //     id: 361,
-  //     name: "Toxic Rick",
-  //     status: "Dead",
-  //     species: "Humanoid",
-  //     type: "Rick's toxic side",
-  //     gender: "Male",
-  //     origin: {
-  //       name: "Detoxifier",
-  //       url: "https://rickandmortyapi.com/api/location/64",
-  //     },
-  //     location: {
-  //       name: "Earth (Replacement Dimension)",
-  //       url: "https://rickandmortyapi.com/api/location/20",
-  //     },
-  //     image: "https://rickandmortyapi.com/api/character/avatar/361.jpeg",
-  //     episode: "S01E05",
-  //     url: "https://rickandmortyapi.com/api/character/361",
-  //     created: "2018-01-10T18:20:41.703Z",
-  //   },
-  //   {
-  //     id: 225,
-  //     name: "Michael Thompson",
-  //     status: "Alive",
-  //     species: "Humanoid",
-  //     type: "Conjoined twin",
-  //     gender: "Male",
-  //     origin: {
-  //       name: "unknown",
-  //       url: "",
-  //     },
-  //     location: {
-  //       name: "Interdimensional Cable",
-  //       url: "https://rickandmortyapi.com/api/location/6",
-  //     },
-  //     image: "https://rickandmortyapi.com/api/character/avatar/225.jpeg",
-  //     episode: "S01E05",
-  //     url: "https://rickandmortyapi.com/api/character/225",
-  //     created: "2017-12-30T15:59:31.558Z",
-  //   },
-  //   {
-  //     id: 120,
-  //     name: "Evil Summer Clone",
-  //     status: "Dead",
-  //     species: "Human",
-  //     type: "Clone",
-  //     gender: "Female",
-  //     origin: {
-  //       name: "unknown",
-  //       url: "",
-  //     },
-  //     location: {
-  //       name: "Earth (C-137)",
-  //       url: "https://rickandmortyapi.com/api/location/1",
-  //     },
-  //     image: "https://rickandmortyapi.com/api/character/avatar/120.jpeg",
-  //     episode: "S01E05",
-  //     url: "https://rickandmortyapi.com/api/character/120",
-  //     created: "2017-12-26T16:24:02.059Z",
-  //   },
-  // ];
 
   favCharItemIndex(item: CharacterI): number {
     return this.favChars.findIndex((char) => char.id === item.id);
   }
 
   openSnackbar(text: string): void {
-    this.snackbarText = text;
-    this.snackbar = true;
+    this.snackbar.text = text;
+    this.snackbar.model = true;
   }
 
   openDeleteDialog(item: CharacterI): void {
@@ -263,10 +182,48 @@ export default class Dashboard extends Vue {
       }
   }
 
+  async setCharacters(page = 1): Promise<void> {
+    this.allCharacters = [];
+    this.charactersModified = [];
+    await getCharacter({ page: page })
+      .then((response: ApiResponseI) => {
+        this.pagination.pageCounter = response.info.pages;
+        this.pagination.currentPage = page;
+        this.allCharacters = response.results;
+      })
+      .catch((error: Error) => console.error(error));
+  }
+
+  prepareData(): void {
+    this.allCharacters.map((el: CharacterI) => {
+      const lastUrl = this.getLastEpisodeUrl(el.episode);
+      this.getEpisodeByChar(el, lastUrl);
+    });
+  }
+
+  async getEpisodeByChar(item: CharacterI, lastUrl: string): Promise<void> {
+    let itemCopy: CharacterI = { ...item };
+    const slashIndex = lastUrl.lastIndexOf("/");
+    const episodeId = lastUrl.substring(slashIndex + 1);
+    const { episode } = await getEpisode(Number(episodeId)).catch(
+      (error: Error) => console.error(error)
+    );
+
+    if (episode) {
+      itemCopy.episode = episode;
+      this.charactersModified.push(itemCopy);
+    }
+  }
+
+  getLastEpisodeUrl(episodes: string | string[]): string {
+    let allEpisodes = episodes;
+    return allEpisodes[allEpisodes.length - 1];
+  }
+
   get getcharacters(): CharacterI[] {
     switch (this.tabModel) {
       case 0:
-        return [];
+        return this.charactersModified;
       case 1:
         return this.favChars;
       default:
@@ -274,8 +231,27 @@ export default class Dashboard extends Vue {
     }
   }
 
+  get checkCharacterArrays(): boolean {
+    return this.charactersModified.length === this.allCharacters.length;
+  }
+
+  get bpMdAndUp(): boolean {
+    return this.$vuetify.breakpoint.mdAndUp;
+  }
+
+  @Watch("allCharacters")
+  onAllCharactersChange(): void {
+    this.prepareData();
+  }
+
   mounted(): void {
+    this.setCharacters();
     this.setStorageData();
   }
 }
 </script>
+<style scoped>
+.tabMargin:nth-child(3) {
+  margin-left: 70px;
+}
+</style>

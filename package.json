@@ -2,6 +2,7 @@
   "name": "rick-morty",
   "version": "0.1.0",
   "private": true,
+  "author": "Paweł Bednarczyk",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -9,6 +10,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "rickmortyapi": "^0.3.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",

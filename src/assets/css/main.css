@@ -8,8 +8,12 @@ th {
   font-weight: inherit;
 }
 
-tr > td:not(.v-data-table__mobile-row):first-child {
-  padding: 10px 0 10px 104px !important;
+tr.v-data-table__mobile-table-row > td.v-data-table__mobile-row:first-child {
+  padding-top: 10px;
+}
+
+tr.v-data-table__mobile-table-row > td.v-data-table__mobile-row:last-child {
+  padding-bottom: 10px;
 }
 
 tr:last-child > td:not(.v-data-table__mobile-row) {
@@ -18,6 +22,22 @@ tr:last-child > td:not(.v-data-table__mobile-row) {
 
 td {
   font-weight: 400 !important;
+}
+
+.v-data-table-header th:not(:last-child) {
+  white-space: nowrap;
+}
+
+.v-data-table__wrapper {
+  overflow-x: hidden;
+}
+.v-data-table-header-mobile__wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.v-data-table-header-mobile__wrapper > div:first-child {
+  max-width: 300px;
 }
 
 th,
@@ -31,9 +51,6 @@ ul.v-pagination > li > button:not(.v-pagination__item--active),
 
 .tableLeftInd {
   padding-left: 104px !important;
-}
-.tableRightInd {
-  padding-right: 104px !important;
 }
 
 .v-text-field {

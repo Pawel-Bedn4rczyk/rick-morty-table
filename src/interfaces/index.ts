@@ -1,3 +1,13 @@
+export interface ApiResponseI {
+  info: {
+    count: number;
+    next: string | null;
+    pages: number;
+    prev: string | null;
+  };
+  results: CharacterI[];
+}
+
 export interface CharacterI {
   id: number;
   name: string;
@@ -14,7 +24,17 @@ export interface CharacterI {
     url: string;
   };
   image: string;
-  episode: string;
+  episode: string | string[];
   url: string;
   created: string;
+}
+
+export interface EpisodeI {
+  id: number;
+  name: string;
+  air_date: string | Date;
+  episode: string;
+  characters: CharacterI[];
+  url: string;
+  created: Date;
 }

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-dialog v-model="value" persistent max-width="600">
+    <v-dialog v-model="value" persistent max-width="700">
       <v-card>
-        <v-card-title class="title d-flex justify-center">
+        <v-card-title class="title text-center d-flex justify-center">
           Are you sure you want to remove this character from the list?
         </v-card-title>
         <v-card-text>
@@ -27,8 +27,7 @@
           </v-row>
         </v-card-text>
         <v-divider />
-        <v-card-actions>
-          <v-spacer></v-spacer>
+        <v-card-actions class="d-flex justify-md-end justify-center">
           <v-btn color="#a9b1bd" text @click="closeDialog"> Cancel</v-btn>
           <v-btn color="#11b0c8" text @click="deleteItem"> Delete </v-btn>
         </v-card-actions>
