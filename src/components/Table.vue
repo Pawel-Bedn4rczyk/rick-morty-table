@@ -10,7 +10,7 @@
       hide-default-footer
       item-key="id"
       sort-by="id"
-      @page-count="favCharactersTab ? (paginationFav.pageCount = $event) : ''"
+      @page-count="paginationFav.pageCount = $event"
     >
       <template v-slot:[`item.image`]="{ item }">
         <div
@@ -58,17 +58,17 @@
       :style="`padding-left:${mobile ? '0' : '94px'}`"
     >
       <v-pagination
-        v-if="!favCharactersTab"
+        v-if="!favCharactersTab && charsArrNotEmpty"
         v-model="pagination.page"
         :length="pagination.pageCount"
         :total-visible="mobile ? '4' : '8'"
         color="#11B0C8"
-        @input="handlePageChange"
         prev-icon="mdi-menu-left"
         next-icon="mdi-menu-right"
+        @input="handlePageChange"
       ></v-pagination>
       <v-pagination
-        v-else
+        v-else-if="charsArrNotEmpty"
         v-model="paginationFav.page"
         :length="paginationFav.pageCount"
         :total-visible="mobile ? '4' : '8'"
@@ -101,7 +101,9 @@ export default class Table extends Mixins(Vue, Pagination) {
   }
 
   handlePageChange(page: number): void {
-    this.$emit("changePage", page);
+    if (page !== this.currentPage) {
+      this.$emit("changePage", page);
+    }
   }
 
   deleteFromFav(item: CharacterI): void {
@@ -157,6 +159,10 @@ export default class Table extends Mixins(Vue, Pagination) {
 
   get favBtnSize(): string {
     return this.mobile ? "35" : "43";
+  }
+
+  get charsArrNotEmpty(): boolean {
+    return this.characters.length > 0;
   }
 }
 </script>

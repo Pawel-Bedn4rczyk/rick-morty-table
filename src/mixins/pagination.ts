@@ -11,6 +11,6 @@ export default class Pagination extends Vue {
   };
   paginationFav = {
     page: 1,
-    pageCount: 0,
+    pageCount: 1,
   };
 }
