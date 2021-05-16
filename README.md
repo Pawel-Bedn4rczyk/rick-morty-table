@@ -1,5 +1,9 @@
 # rick-morty
 
+## Netlify
+
+https://dc-rick-morty.netlify.app/
+
 ## Project setup
 ```
 npm install
