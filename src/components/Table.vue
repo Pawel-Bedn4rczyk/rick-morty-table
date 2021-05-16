@@ -17,10 +17,12 @@
           :style="`padding:${mobile ? '10px 0 10px 0' : '10px 0 10px 90px'}`"
         >
           <v-img
+            :src="item.image"
+            :alt="`${item.name} image`"
             height="68"
             width="43"
-            :src="item.image"
-            alt="Character image"
+            style="cursor: pointer"
+            @click="openImage(item.image, item.name)"
           />
         </div>
       </template>
@@ -95,6 +97,10 @@ export default class Table extends Mixins(Vue, Pagination) {
   @Prop() searchVal?: string;
   @Prop() characters!: CharacterI[];
   @Prop() mobile!: boolean;
+
+  openImage(imageUrl: string, charName: string): void {
+    this.$emit("openImageDialog", imageUrl, charName);
+  }
 
   addToFav(item?: CharacterI): void {
     this.$emit("favAdd", item);

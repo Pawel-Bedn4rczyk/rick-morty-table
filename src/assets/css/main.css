@@ -70,3 +70,8 @@ ul.v-pagination > li > button:not(.v-pagination__item--active),
   box-shadow: none;
   border: 1px solid #a9b1bd;
 }
+
+.dialogTitle {
+  font-size: 16px !important;
+  color: #a9b1bd;
+}

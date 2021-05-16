@@ -28,3 +28,11 @@ export interface EpisodeI {
   url: string;
   created: Date;
 }
+
+export interface DashboardDialogsDataI {
+  deleteDialog: boolean;
+  imageDialog: boolean;
+  itemToDelete: CharacterI | null;
+  imageUrl: string;
+  charName: string;
+}

@@ -58,6 +58,7 @@
             :mobile="!bpMdAndUp"
             @changePage="setCharacters"
             @favAdd="favAdd"
+            @openImageDialog="openImageDialog"
             @openDeleteDialog="openDeleteDialog"
           />
         </v-tab-item>
@@ -75,21 +76,28 @@
       {{ snackbar.text }}
     </v-snackbar>
     <DeleteDialog
-      v-model="deleteDialog"
-      v-if="deleteDialog"
-      :item="itemToDelete"
+      v-model="dialogs.deleteDialog"
+      v-if="dialogs.deleteDialog"
+      :item="dialogs.itemToDelete"
       @accept="removeFav"
+    />
+    <ImageDialog
+      v-model="dialogs.imageDialog"
+      v-if="dialogs.imageDialog"
+      :imageUrl="dialogs.imageUrl"
+      :charName="dialogs.charName"
     />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import Logo from "@/components/Logo.vue";
-import Table from "@/components/Table.vue";
-import DeleteDialog from "@/components/DeleteDialog.vue";
+import Logo from "./Logo.vue";
+import Table from "./Table.vue";
+import DeleteDialog from "./dialogs/DeleteDialog.vue";
+import ImageDialog from "./dialogs/ImageDialog.vue";
 import { DashboardTabsE } from "@/enums";
-import { CharacterI } from "@/interfaces";
+import { CharacterI, DashboardDialogsDataI } from "@/interfaces";
 import axios from "axios";
 
 @Component({
@@ -97,17 +105,24 @@ import axios from "axios";
     Logo,
     Table,
     DeleteDialog,
+    ImageDialog,
   },
 })
 export default class Dashboard extends Vue {
   tabModel = 0;
   search = "";
   defaultColor = "#11B0C8";
-  deleteDialog = false;
-  itemToDelete: CharacterI | null = null;
   charactersModified: CharacterI[] = [];
   allCharacters: CharacterI[] = [];
   favChars: CharacterI[] = [];
+
+  dialogs: DashboardDialogsDataI = {
+    deleteDialog: false,
+    imageDialog: false,
+    itemToDelete: null,
+    imageUrl: "",
+    charName: "",
+  };
 
   snackbar = {
     model: false,
@@ -138,8 +153,14 @@ export default class Dashboard extends Vue {
   }
 
   openDeleteDialog(item: CharacterI): void {
-    this.itemToDelete = item;
-    this.deleteDialog = true;
+    this.dialogs.itemToDelete = item;
+    this.dialogs.deleteDialog = true;
+  }
+
+  openImageDialog(imageUrl: string, charName: string): void {
+    this.dialogs.imageUrl = imageUrl;
+    this.dialogs.charName = charName;
+    this.dialogs.imageDialog = true;
   }
 
   favAdd(item: CharacterI): void {
@@ -155,12 +176,12 @@ export default class Dashboard extends Vue {
   }
 
   removeFav(): void {
-    if (this.itemToDelete) {
-      let index = this.favCharItemIndex(this.itemToDelete);
+    if (this.dialogs.itemToDelete) {
+      let index = this.favCharItemIndex(this.dialogs.itemToDelete);
       if (index > -1) {
         this.favChars.splice(index, 1);
         this.favStorageUpdate();
-        this.itemToDelete = null;
+        this.dialogs.itemToDelete = null;
         this.openSnackbar("Successfully deleted from list");
       }
     }

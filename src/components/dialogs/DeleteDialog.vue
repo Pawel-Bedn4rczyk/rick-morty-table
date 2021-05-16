@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="value" persistent max-width="700">
       <v-card>
-        <v-card-title class="title text-center d-flex justify-center">
+        <v-card-title class="dialogTitle text-center d-flex justify-center">
           Are you sure you want to remove this character from the list?
         </v-card-title>
         <v-card-text>
@@ -18,7 +18,7 @@
                   <v-icon color="#11b0c8"> {{ obj.icon }} </v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title class="title">
+                  <v-list-item-title class="dialogTitle">
                     {{ item[obj.key] }}
                   </v-list-item-title>
                 </v-list-item-content>
@@ -94,9 +94,3 @@ export default class DeleteDialog extends Vue {
   }
 }
 </script>
-<style scoped>
-.title {
-  font-size: 16px !important;
-  color: #a9b1bd;
-}
-</style>
