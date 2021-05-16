@@ -1,13 +1,3 @@
-export interface ApiResponseI {
-  info: {
-    count: number;
-    next: string | null;
-    pages: number;
-    prev: string | null;
-  };
-  results: CharacterI[];
-}
-
 export interface CharacterI {
   id: number;
   name: string;

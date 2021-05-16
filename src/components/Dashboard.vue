@@ -89,8 +89,8 @@ import Logo from "@/components/Logo.vue";
 import Table from "@/components/Table.vue";
 import DeleteDialog from "@/components/DeleteDialog.vue";
 import { DashboardTabsE } from "@/enums";
-import { CharacterI, ApiResponseI } from "@/interfaces";
-import { getCharacter, getEpisode } from "rickmortyapi";
+import { CharacterI } from "@/interfaces";
+import axios from "axios";
 
 @Component({
   components: {
@@ -185,11 +185,12 @@ export default class Dashboard extends Vue {
   async setCharacters(page = 1): Promise<void> {
     this.allCharacters = [];
     this.charactersModified = [];
-    await getCharacter({ page: page })
-      .then((response: ApiResponseI) => {
-        this.pagination.pageCounter = response.info.pages;
+    await axios
+      .get(`https://rickandmortyapi.com/api/character/?page=${page}`)
+      .then((response) => {
+        this.pagination.pageCounter = response.data.info.pages;
         this.pagination.currentPage = page;
-        this.allCharacters = response.results;
+        this.allCharacters = response.data.results;
       })
       .catch((error: Error) => console.error(error));
   }
@@ -202,12 +203,14 @@ export default class Dashboard extends Vue {
   }
 
   async getEpisodeByChar(item: CharacterI, lastUrl: string): Promise<void> {
+    let episode = "";
     let itemCopy: CharacterI = { ...item };
     const slashIndex = lastUrl.lastIndexOf("/");
     const episodeId = lastUrl.substring(slashIndex + 1);
-    const { episode } = await getEpisode(Number(episodeId)).catch(
-      (error: Error) => console.error(error)
-    );
+    await axios
+      .get(`https://rickandmortyapi.com/api/episode/${Number(episodeId)}`)
+      .then((resp) => (episode = resp.data.episode))
+      .catch((error: Error) => console.error(error));
 
     if (episode) {
       itemCopy.episode = episode;
